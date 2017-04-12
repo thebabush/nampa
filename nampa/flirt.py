@@ -492,6 +492,5 @@ def parse_flirt_file(f):
 
     tree = parse_tree(f, header.version, is_root=True)
 
-    # assert f.read() == ''  # Have we read all the file?
+    assert f.read() == ''  # Have we read all the file?
     return FlirtFile(header, tree)
-
