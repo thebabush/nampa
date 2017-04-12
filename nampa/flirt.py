@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import binrw
+from . import binrw
 from builtins import range
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import zlib
 import logging
 
@@ -492,5 +495,5 @@ def parse_flirt_file(f):
 
     tree = parse_tree(f, header.version, is_root=True)
 
-    assert f.read() == ''  # Have we read all the file?
+    assert len(f.read()) == 0  # Have we read all the file?
     return FlirtFile(header, tree)
