@@ -9,14 +9,16 @@ import logging
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+# log.setLevel(logging.DEBUG)
 
 
-def list2hex(ll):
+def list2hexstring(ll):
     return ''.join(['{:02X}'.format(l) for l in ll])
 
 
 def pattern2string(pp, mask_array):
+    if pp is None:
+        return ''
     return ''.join(['{:02X}'.format(p) if not m else '..' for p, m in zip(pp, mask_array)])
 
 
@@ -241,6 +243,16 @@ class FlirtNode(object):
         self.variant_mask = variant_mask
         self.pattern = pattern
 
+    @property
+    def is_leaf(self):
+        return len(self.children) == 0
+
+    def __str__(self):
+        return '<{}: children={}, modules={}, length={}, variant={}, pattern="{}">'.format(
+            self.__class__.__name__, len(self.children), len(self.modules), self.length, self.variant_mask
+            , pattern2string(self.pattern, self.variant_mask)
+        )
+
 
 class FlirtHeader(object):
     def __init__(self, version, arch, file_types, os_types, app_types, features, old_n_functions, crc16, ctype
@@ -426,7 +438,6 @@ def parse_module(f, version, crc_length, crc16):
     return FlirtModule(crc_length, crc16, length, public_fuctions, tail_bytes, referenced_functions), flags
 
 
-
 def parse_modules(f, version):
     modules = list()
     while True:
@@ -462,7 +473,7 @@ def parse_tree(f, version, is_root):
     if nodes == 0:
         log.debug('leaf')
         modules = parse_modules(f, version)
-        return FlirtNode([], modules, 0, None, None)
+        return FlirtNode([], modules, length, variant_mask, pattern)
 
     children = list()
     for i in range(nodes):
@@ -481,6 +492,6 @@ def parse_flirt_file(f):
 
     tree = parse_tree(f, header.version, is_root=True)
 
-    assert f.read() == ''  # Have we read all the file?
+    # assert f.read() == ''  # Have we read all the file?
     return FlirtFile(header, tree)
 
