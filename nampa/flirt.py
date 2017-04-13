@@ -15,6 +15,9 @@ log = logging.getLogger(__name__)
 # log.setLevel(logging.DEBUG)
 
 
+FLIRT_NAME_MAX = 1024
+
+
 def list2hexstring(ll):
     return ''.join(['{:02X}'.format(l) for l in ll])
 
@@ -69,9 +72,6 @@ def read_node_bytes(f, length, variant_mask):
         variant_bools.append(curr_mask_bool)
         mask_bit >>= 1
     return variant_bools, pattern
-
-
-FLIRT_NAME_MAX = 1024
 
 
 class FlirtArch(object):
