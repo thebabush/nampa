@@ -70,4 +70,8 @@ def main(fpath):
 
 
 if __name__ == '__main__':
-    main(os.path.expanduser('~/libc_16_04_x64.sig'))
+    if len(sys.argv) != 2:
+        print("Usage: {} input_file.sig".format(sys.argv[0]))
+        exit()
+
+    main(sys.argv[1])
