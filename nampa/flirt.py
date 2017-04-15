@@ -1,8 +1,16 @@
 #!/usr/bin/env python
+# Barely-tested port of
+# https://github.com/radare/radare2/blob/e8f80a165c7dd89d955a1ee7f432bd9a1ba88976/libr/anal/flirt.c
 
 from __future__ import print_function
 from . import binrw
-from builtins import range
+from . import crc
+from builtins import range, bytes
+try:
+    from typing import List
+except ImportError:
+    pass
+from itertools import izip, islice
 try:
     from StringIO import StringIO
 except ImportError:
@@ -13,6 +21,8 @@ import logging
 logging.basicConfig()
 log = logging.getLogger(__name__)
 # log.setLevel(logging.DEBUG)
+mlog = logging.getLogger(__name__ + '_match')
+# mlog.setLevel(logging.DEBUG)
 
 
 FLIRT_NAME_MAX = 1024
@@ -221,6 +231,11 @@ class FlirtFunction(object):
         self.is_local = is_local
         self.is_collision = is_collision
 
+    def __str__(self):
+        return '<{}: name={}, offset=0x{:04X}, negative_offset={}, is_local={}, is_collision={}>'.format(
+            self.__class__.__name__, self.name, self.offset, self.negative_offset, self.is_local, self.is_collision
+        )
+
 
 class FlirtTailByte(object):
     def __init__(self, offset, value):
@@ -230,6 +245,7 @@ class FlirtTailByte(object):
 
 class FlirtModule(object):
     def __init__(self, crc_length, crc16, length, public_functions, tail_bytes, referenced_functions):
+        # type: (int, int, int, List[FlirtFunction], List[FlirtTailByte], List[FlirtFunction]) -> ()
         self.crc_length = crc_length
         self.crc16 = crc16
         self.length = length
@@ -277,11 +293,13 @@ class FlirtHeader(object):
 
 class FlirtFile(object):
     def __init__(self, header, root):
+        # type: (FlirtHeader, FlirtNode) -> ()
         self.header = header
         self.root = root
 
 
 def parse_header(f):
+    # type: (file) -> (FlirtHeader)
     magic = f.read(6)
     if magic != b'IDASGN':
         raise FlirtException('Wrong file type')
@@ -486,6 +504,7 @@ def parse_tree(f, version, is_root):
 
 
 def parse_flirt_file(f):
+    # type: (file) -> FlirtFile
     header = parse_header(f)
     log.debug("Version: {}".format(header.version))
     if header.features & FlirtFeatureFlag.FEATURE_COMPRESSED:
@@ -497,3 +516,68 @@ def parse_flirt_file(f):
 
     assert len(f.read(1)) == 0  # Have we read all the file?
     return FlirtFile(header, tree)
+
+
+def match_node_pattern(node, buff, offset):
+    # type: (FlirtNode, bytes, int) -> bool
+    assert len(buff) - offset > 0
+
+    # Check if we have enough data
+    if len(buff) < offset + len(node.pattern):
+        return False
+
+    for i, (b, p, v) in enumerate(izip(islice(buff, offset, len(buff)), node.pattern, node.variant_mask)):
+        if v:
+            continue
+        elif b != p:
+            return False
+
+    return True
+
+
+# TODO: Write tests
+def match_module(module, buff, addr, offset, callback):
+    # type: (FlirtModule, bytes, int) -> bool
+    buff_size = len(buff) - offset
+    mlog.debug('buff_size: 0x{:08X}'.format(buff_size))
+    mlog.debug('CRC: {:04X} - {:04X}'.format(module.crc16, crc.crc16(buff[offset+32:offset+32+module.crc_length])))
+    if 32 + module.crc_length < buff_size and module.crc16 != crc.crc16(buff[offset+32:offset+32+module.crc_length]):
+        return False
+
+    for tb in module.tail_bytes:
+        if 32 + module.crc_length + tb.offset < buff_size \
+                and buff[offset+32+module.crc_length+tb.offset] != tb.value:
+            log.debug('Tail: {:02X} - {:02X}'.format(tb.value, buff[offset+32+module.crc_length+tb.offset]))
+            return False
+
+    # TODO: referenced functions are not yet implemented in radare2
+
+    for funk in module.public_functions:
+        mlog.debug('Function: {}, offset=0x{:04X}'.format(funk.name, funk.offset))
+        callback(addr, funk)
+
+    return True
+
+
+def match_node(node, buff, addr, offset, callback):
+    if match_node_pattern(node, buff, offset):
+        mlog.debug('found prefix: {}'.format(pattern2string(node.pattern, node.variant_mask)))
+        for child in node.children:
+            if match_node(child, buff, addr, offset + node.length, callback):
+                return True
+        for module in node.modules:
+            if match_module(module, buff, addr, offset, callback):
+                return True
+    return False
+
+
+def match_function(sig, buff, addr, callback):
+    # type: (FlirtFile, bytes) -> bool
+    # assert type(buff) is bytes
+    if type(buff) is str:
+        buff = bytes(buff)
+
+    for child in sig.root.children:
+        if match_node(child, buff, addr, 0, callback):
+            return True
+    return False

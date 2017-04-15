@@ -5,3 +5,4 @@ dump.txt
 __pycache__/
 *.pyc
 *.swp
+cache/

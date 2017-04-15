@@ -7,3 +7,4 @@ sed -i '/^packaging==/d' $f
 sed -i '/^pkg-resources==/d' $f
 sed -i '/^pyparsing==/d' $f
 sed -i '/^six==/d' $f
+sed -i '/^typing==/d' $f
