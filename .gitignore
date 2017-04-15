@@ -4,3 +4,4 @@ test.py
 dump.txt
 __pycache__/
 *.pyc
+*.swp
