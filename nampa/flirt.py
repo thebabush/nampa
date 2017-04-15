@@ -540,14 +540,14 @@ def match_module(module, buff, addr, offset, callback):
     # type: (FlirtModule, bytes, int) -> bool
     buff_size = len(buff) - offset
     mlog.debug('buff_size: 0x{:08X}'.format(buff_size))
-    mlog.debug('CRC: {:04X} - {:04X}'.format(module.crc16, crc.crc16(buff[offset+32:offset+32+module.crc_length])))
-    if 32 + module.crc_length < buff_size and module.crc16 != crc.crc16(buff[offset+32:offset+32+module.crc_length]):
+    if module.crc_length < buff_size and module.crc16 != crc.crc16(buff[offset:offset+module.crc_length]):
+        mlog.debug('CRC: {:04X} - {:04X}'.format(module.crc16, crc.crc16(buff[offset:offset+module.crc_length])))
         return False
 
     for tb in module.tail_bytes:
-        if 32 + module.crc_length + tb.offset < buff_size \
-                and buff[offset+32+module.crc_length+tb.offset] != tb.value:
-            log.debug('Tail: {:02X} - {:02X}'.format(tb.value, buff[offset+32+module.crc_length+tb.offset]))
+        if module.crc_length + tb.offset < buff_size \
+                and buff[offset+module.crc_length+tb.offset] != tb.value:
+            log.debug('Tail: {:02X} - {:02X}'.format(tb.value, buff[offset+module.crc_length+tb.offset]))
             return False
 
     # TODO: referenced functions are not yet implemented in radare2
@@ -566,7 +566,7 @@ def match_node(node, buff, addr, offset, callback):
             if match_node(child, buff, addr, offset + node.length, callback):
                 return True
         for module in node.modules:
-            if match_module(module, buff, addr, offset, callback):
+            if match_module(module, buff, addr, offset + node.length, callback):
                 return True
     return False
 
