@@ -520,7 +520,7 @@ def parse_flirt_file(f):
 
 def match_node_pattern(node, buff, offset):
     # type: (FlirtNode, bytes, int) -> bool
-    assert len(buff) - offset > 0
+    assert len(buff) - offset >= 0
 
     # Check if we have enough data
     if len(buff) < offset + len(node.pattern):

@@ -16,6 +16,7 @@ import nampa
 
 
 DEV_MODE = False
+FUNCTION_TAIL_LENGTH = 0x100
 LIBRARY = [
     ('Ubuntu - libc6-dev_2.15-0ubuntu10.15 [armhf]', 'https://github.com/push0ebp/sig-database/raw/master/debian/arm/libc6-dev_2.15-0ubuntu10.15_armhf.sig'),
     ('Ubuntu - libc6-dev_2.15-0ubuntu10.15 [armel]', 'https://github.com/push0ebp/sig-database/raw/master/debian/arm/libc6-dev_2.15-0ubuntu10.15_armel.sig'),
@@ -75,7 +76,8 @@ def analysis_callback(bv, addr, funk, **kwargs):
     # TODO: split/merge/reanalyze the matching functions
     bv_funk = bv.get_function_at(addr + funk.offset)
     if bv_funk is None:
-        ilog('!!! Please send the files to the nampa\'s author !!!')
+        # ilog('!!! Please send the files to the nampa\'s author !!!')
+        ilog('!!! no function "{}" @ {:08X}'.format(funk.name, addr + funk.offset))
         return
     # assert bv_funk is not None
 
@@ -96,6 +98,16 @@ def analysis_callback(bv, addr, funk, **kwargs):
     print('{:08X}: {} => {}'.format(addr, funk, action))
 
 
+def get_function_end(funk, end=None):
+    if end is None:
+        end = funk.start
+
+    for b in funk.basic_blocks:
+        end = max(end, b.end)
+
+    return end
+
+
 def match_functions(bv, flirt_path, action, keep_manually_renamed, prefix):
     callback = partial(analysis_callback, bv, action=action, keep_manually_renamed=keep_manually_renamed, prefix=prefix)
     ilog('opening "{}"'.format(flirt_path))
@@ -104,10 +116,16 @@ def match_functions(bv, flirt_path, action, keep_manually_renamed, prefix):
         ilog('signature name: "{}"'.format(flirt.header.library_name))
 
         ilog('processing...')
-        ff = [f.start for f in bv.functions] + [bv.end]
-        for f_start, f_end in zip(ff[:-1], ff[1:]):
-            buff = bytes(bv.read(f_start, f_end - f_start))
+        for funk in bv.functions:
+            f_start = funk.start
+            f_end = get_function_end(funk)
+            buff = bytes(bv.read(f_start, f_end - f_start + FUNCTION_TAIL_LENGTH))
             nampa.match_function(flirt, buff, f_start, callback)
+
+        # ff = [f.start for f in bv.functions] + [bv.end]
+        # for f_start, f_end in zip(ff[:-1], ff[1:]):
+        #     buff = bytes(bv.read(f_start, f_end - f_start))
+        #     nampa.match_function(flirt, buff, f_start, callback)
 
     ilog('done :B')
 
