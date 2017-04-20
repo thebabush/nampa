@@ -45,5 +45,5 @@ A big part of this project is basically a python port of
 
 ### License
 
-The original radare's flirt.c is under LGPL so my deep knowledge of software licenses tell me that I must keep it
+The original radare's flirt.c is under LGPL, so my deep knowledge of software licenses tells me that I must keep it
 that way.
