@@ -14,6 +14,13 @@ It comes with its own command-line tool for analyzing such files: `dumpsig.py`.
 This repository will likely be split into a python-only package and a Binary Ninja plugin in the future,
 as the former is completely decoupled from the latter.
 
+Nampa comes with a small library of `.sig` files, automatically downloaded
+from 3rd-party GitHub repositories when needed.
+
+## Screenshot
+
+![Dialog](./img/dialog.png)
+
 ## Installation
 
 ```bash
