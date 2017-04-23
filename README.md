@@ -30,6 +30,8 @@ cd nampa
 pip install -r requirements.txt # or sudo apt-get install python-future
 ```
 
+**NOTE:** apparently, Binary Ninja for Windows ships with its own python distribution so `pip install` accordingly.
+
 ## About
 
 Nampa ([なんぱ](http://jisho.org/search/%E8%BB%9F%E6%B4%BE)) is the Japanese art of picking up women on the street.
