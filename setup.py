@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='nampa',
-      version='0.1',
+      version='0.1.0',
       description='FLIRT signatures for python',
       url='https://github.com/kenoph/nampa',
       author='Paolo Montesel',
