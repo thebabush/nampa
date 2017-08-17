@@ -2,6 +2,7 @@
 
 f=requirements.txt
 pip freeze > $f
+sed -i 's/future.*/future/' $f
 sed -i '/^appdirs==/d' $f
 sed -i '/^packaging==/d' $f
 sed -i '/^pkg-resources==/d' $f

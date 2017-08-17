@@ -5,12 +5,12 @@
 from __future__ import print_function
 from . import binrw
 from . import crc
-from builtins import range, bytes
+from builtins import range, bytes, zip
 try:
     from typing import List
 except ImportError:
     pass
-from itertools import izip, islice
+from itertools import islice
 try:
     from StringIO import StringIO
 except ImportError:
@@ -526,7 +526,7 @@ def match_node_pattern(node, buff, offset):
     if len(buff) < offset + len(node.pattern):
         return False
 
-    for i, (b, p, v) in enumerate(izip(islice(buff, offset, len(buff)), node.pattern, node.variant_mask)):
+    for i, (b, p, v) in enumerate(zip(islice(buff, offset, len(buff)), node.pattern, node.variant_mask)):
         if v:
             continue
         elif b != p:
