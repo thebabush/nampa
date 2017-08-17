@@ -23,6 +23,14 @@ from 3rd-party GitHub repositories when needed.
 
 ## Installation
 
+For use as a python library:
+
+```bash
+pip install nampa
+```
+
+For use as a Binary Ninja plugin:
+
 ```bash
 cd ~/.binaryninja/plugins/
 git clone git@github.com:kenoph/nampa.git
