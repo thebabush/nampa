@@ -11,5 +11,10 @@ setup(name='nampa',
           'future',
       ],
       scripts=['dumpsig.py'],
+      classifiers=[
+          'Development Status :: 3 - Alpha',
+          'Programming Language :: Python :: 2',
+          'Programming Language :: Python :: 3',
+      ],
       zip_safe=False)
 
