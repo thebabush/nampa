@@ -30,6 +30,8 @@ cd nampa
 pip install -r requirements.txt # or sudo apt-get install python-future
 ```
 
+**NOTE:** apparently, Binary Ninja for Windows ships with its own python distribution so `pip install` accordingly.
+
 ## About
 
 Nampa ([なんぱ](http://jisho.org/search/%E8%BB%9F%E6%B4%BE)) is the Japanese art of picking up women on the street.
@@ -45,5 +47,5 @@ A big part of this project is basically a python port of
 
 ### License
 
-The original radare's flirt.c is under LGPL so my deep knowledge of software licenses tell me that I must keep it
+The original radare's flirt.c is under LGPL, so my deep knowledge of software licenses tells me that I must keep it
 that way.
