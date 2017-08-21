@@ -275,7 +275,7 @@ class FlirtNode(object):
 
 class FlirtHeader(object):
     def __init__(self, version, arch, file_types, os_types, app_types, features, old_n_functions, crc16, ctype
-                 , ctypes_crc16, n_functions, pattern_size, library_name):
+                 , ctypes_crc16, n_functions, pattern_size, ctype_unk, library_name):
         self.version = version
         self.arch = arch
         self.file_types = file_types
@@ -288,6 +288,7 @@ class FlirtHeader(object):
         self.ctypes_crc16 = ctypes_crc16
         self.n_functions = n_functions
         self.pattern_size = pattern_size
+        self.ctype_unk = ctype_unk
         self.library_name = library_name
 
 
@@ -305,7 +306,7 @@ def parse_header(f):
         raise FlirtException('Wrong file type')
 
     version = binrw.read_u8(f)
-    if version < 5 or version > 9:
+    if version < 5 or version > 10:
         raise FlirtException('Unknown version: {}'.format(version))
 
     arch = binrw.read_u8(f)
@@ -321,16 +322,20 @@ def parse_header(f):
 
     n_functions = None
     pattern_size = None
+    ctype_unk = None
     if version >= 6:
         n_functions = binrw.read_u32le(f)
 
         if version >= 8:
             pattern_size = binrw.read_u16le(f)
 
+            if version >= 10:
+                ctype_unk = binrw.read_u16le(f)
+
     library_name = f.read(library_name_len)
 
     return FlirtHeader(version, arch, file_types, os_types, app_types, features, old_n_functions, crc16, ctype
-                       , ctypes_crc16, n_functions, pattern_size, library_name)
+                       , ctypes_crc16, n_functions, pattern_size, ctype_unk, library_name)
 
 
 def parse_tail_byte(f, version):
