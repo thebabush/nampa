@@ -547,7 +547,7 @@ def match_module(module, buff, addr, offset, callback):
     for tb in module.tail_bytes:
         if module.crc_length + tb.offset < buff_size \
                 and buff[offset+module.crc_length+tb.offset] != tb.value:
-            log.debug('Tail: {:02X} - {:02X}'.format(tb.value, buff[offset+module.crc_length+tb.offset]))
+            mlog.debug('Tail: {:02X} - {:02X}'.format(tb.value, buff[offset+module.crc_length+tb.offset]))
             return False
 
     # TODO: referenced functions are not yet implemented in radare2
