@@ -3,6 +3,8 @@ from __future__ import print_function
 import errno
 import hashlib
 import os
+import sys
+
 from functools import partial
 try:
     from urllib import urlretrieve
@@ -10,7 +12,11 @@ except ImportError:
     from urllib.request import urlretrieve
 
 from binaryninja import *
-from builtins import bytes
+try:
+    from builtins import bytes
+except ImportError:
+    from __builtin__ import bytes
+
 
 import nampa
 
@@ -119,7 +125,11 @@ def match_functions(bv, flirt_path, action, keep_manually_renamed, prefix):
         for funk in bv.functions:
             f_start = funk.start
             f_end = get_function_end(funk)
-            buff = bytes(bv.read(f_start, f_end - f_start + FUNCTION_TAIL_LENGTH))
+            buff = bv.read(f_start, f_end - f_start + FUNCTION_TAIL_LENGTH)
+            if sys.version_info[0] < 3:
+                buff = bytearray(buff)
+            else:
+                buff = bytes(buff)
             nampa.match_function(flirt, buff, f_start, callback)
 
         # ff = [f.start for f in bv.functions] + [bv.end]
