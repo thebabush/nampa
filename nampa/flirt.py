@@ -5,7 +5,13 @@
 from __future__ import print_function
 from . import binrw
 from . import crc
-from builtins import range, bytes, zip
+import sys
+
+try:
+    from builtins import range, bytes, zip
+except ImportError:
+    from __builtin__ import range, bytes, zip
+
 try:
     from typing import List
 except ImportError:
@@ -580,7 +586,10 @@ def match_function(sig, buff, addr, callback):
     # type: (FlirtFile, bytes) -> bool
     # assert type(buff) is bytes
     if type(buff) is str:
-        buff = bytes(buff)
+        if sys.version_info[0] < 3:
+            buff = bytearray(buff)
+        else:
+            buff = bytes(buff)
 
     for child in sig.root.children:
         if match_node(child, buff, addr, 0, callback):
