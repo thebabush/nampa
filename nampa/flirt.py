@@ -515,7 +515,7 @@ def parse_flirt_file(f):
     if header.features & FlirtFeatureFlag.FEATURE_COMPRESSED:
         if header.version == 5:
             raise FlirtException('Compression in unsupported on flirt v5')
-        f = StringIO.StringIO(zlib.decompress(f.read()))  # Untested
+        f = StringIO(zlib.decompress(f.read()))
 
     tree = parse_tree(f, header.version, is_root=True)
 
