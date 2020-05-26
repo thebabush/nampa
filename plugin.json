@@ -1,24 +1,24 @@
 {
-  "plugin": {
-    "name": "Nampa",
-    "type": ["core", "binaryview"],
-    "api": "python2",
-    "description": "FLIRT for (binary) ninjas",
-    "longdescription": "Plugin for using FLIRT signatures inside of Binary Ninja. Most of the code is a port from radare's implementation.",
-    "license": {
-      "name": "LGPL v3"
-    },
-    "dependencies": {
-      "pip": ["future"],
-      "apt": [],
-      "installers": [],
-      "other": []
-    },
-    "version": "0.1 alpha",
-    "author": "Paolo Montesel (github.com/kenoph)",
-    "minimumBinaryNinjaVersion": {
-      "dev": "1.0.dev-576",
-      "release": "9999"
-    }
-  }
+  "pluginmetadataversion": 2,
+  "name": "Nampa",
+  "type": ["core", "binaryview"],
+  "api": ["python3"],
+  "description": "FLIRT for (binary) ninjas",
+  "longdescription": "Plugin for using FLIRT signatures inside of Binary Ninja.",
+  "license": {
+          "name": "LGPL v3",
+          "text": "This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 3.0 of the License, or (at your option) any later version.\n\nThis library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.\n\nYou should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA"
+  },
+  "platforms": ["Windows", "Linux", "Darwin"],
+  "installinstructions" : {
+          "Windows":"```\npip install -r requirements.txt\n```",
+          "Linux":"```\npip install -r requirements.txt\n```",
+          "Darwin":"```\npip install -r requirements.txt\n```"
+  },
+  "dependencies": {
+      "pip": ["future"]
+  },
+  "version": "1.0",
+  "author": "Paolo Montesel (https://github.com/thebabush)",
+  "minimumbinaryninjaversion": 0
 }
