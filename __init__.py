@@ -12,20 +12,12 @@ except ImportError:
 from binaryninja import *
 from builtins import bytes
 
-import nampa
+from . import nampa
 
 
 DEV_MODE = False
 FUNCTION_TAIL_LENGTH = 0x100
 LIBRARY = [
-    ('Ubuntu - libc6-dev_2.15-0ubuntu10.15 [armhf]', 'https://github.com/push0ebp/sig-database/raw/master/debian/arm/libc6-dev_2.15-0ubuntu10.15_armhf.sig'),
-    ('Ubuntu - libc6-dev_2.15-0ubuntu10.15 [armel]', 'https://github.com/push0ebp/sig-database/raw/master/debian/arm/libc6-dev_2.15-0ubuntu10.15_armel.sig'),
-    ('Ubuntu 14.04 - libc [x64]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_14_04_x64.sig'),
-    ('Ubuntu 14.04 - libc [x86]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_14_04_x86.sig'),
-    ('Ubuntu 15.10 - libc [x64]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_15_10_x64.sig'),
-    ('Ubuntu 15.10 - libc [x86]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_15_10_x86.sig'),
-    ('Ubuntu 16.04 - libc [x64]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_16_04_x64.sig'),
-    ('Ubuntu 16.04 - libc [x86]', 'https://github.com/push0ebp/sig-database/raw/master/ubuntu/libc_16_04_x86.sig'),
     ('Windows - libvcruntime 15 [arm]', 'https://github.com/Maktm/FLIRTDB/raw/master/vcruntime/windows/libvcruntime_15_msvc_arm.sig'),
     ('Windows - libvcruntime 15 [x64]', 'https://github.com/Maktm/FLIRTDB/raw/master/vcruntime/windows/libvcruntime_15_msvc_x64.sig'),
     ('Windows - libvcruntime 15 [x86]', 'https://github.com/Maktm/FLIRTDB/raw/master/vcruntime/windows/libvcruntime_15_msvc_x86.sig'),
@@ -50,7 +42,7 @@ def ilog(msg):
 
 def make_name_from_url(url):
     m = hashlib.md5()
-    m.update(url)
+    m.update(url.encode('utf-8'))
     return m.hexdigest() + '.sig'
 
 
@@ -61,7 +53,11 @@ def get_library_file_path(idx):
     # Download if not cached
     if not os.path.exists(dst_path):
         ilog('downloading "{}" to "{}"...'.format(name, dst_path))
-        urlretrieve(url, dst_path)
+        try:
+            urlretrieve(url, dst_path)
+        except Exception as e:
+            log_error("nampa> Can't retrieve package {}. Exception: {}".format(name, str(e)))
+            return None
 
     return dst_path
 
@@ -165,7 +161,8 @@ def match_functions_gui(bv):
     else:
         flirt_path = get_library_file_path(gui_from_library.result)
 
-    match_functions(bv, flirt_path, action, keep_manually_renamed, prefix)
+    if flirt_path is not None:
+        match_functions(bv, flirt_path, action, keep_manually_renamed, prefix)
 
 PluginCommand.register(
     name='Nampa - GUI (flirt)',
