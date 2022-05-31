@@ -11,10 +11,7 @@ try:
 except ImportError:
     pass
 from itertools import islice
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import BytesIO
 import zlib
 import logging
 
@@ -515,7 +512,7 @@ def parse_flirt_file(f):
     if header.features & FlirtFeatureFlag.FEATURE_COMPRESSED:
         if header.version == 5:
             raise FlirtException('Compression in unsupported on flirt v5')
-        f = StringIO(zlib.decompress(f.read()))
+        f = BytesIO(zlib.decompress(f.read()))
 
     tree = parse_tree(f, header.version, is_root=True)
 
