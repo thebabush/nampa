@@ -510,9 +510,10 @@ def parse_flirt_file(f):
     header = parse_header(f)
     log.debug("Version: {}".format(header.version))
     if header.features & FlirtFeatureFlag.FEATURE_COMPRESSED:
-        if header.version == 5:
-            raise FlirtException('Compression in unsupported on flirt v5')
-        f = BytesIO(zlib.decompress(f.read()))
+        if header.version >= 5 and header.version < 7:
+            f = BytesIO(zlib.decompress(f.read(), -zlib.MAX_WBITS))
+        else:
+            f = BytesIO(zlib.decompress(f.read()))
 
     tree = parse_tree(f, header.version, is_root=True)
 
