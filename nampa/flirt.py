@@ -2,7 +2,6 @@
 # Barely-tested port of
 # https://github.com/radare/radare2/blob/e8f80a165c7dd89d955a1ee7f432bd9a1ba88976/libr/anal/flirt.c
 
-from __future__ import print_function
 from . import binrw
 from . import crc
 from builtins import range, bytes, zip
