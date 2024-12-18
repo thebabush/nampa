@@ -15,9 +15,6 @@
           "Linux":"```\npip install -r requirements.txt\n```",
           "Darwin":"```\npip install -r requirements.txt\n```"
   },
-  "dependencies": {
-      "pip": ["future"]
-  },
   "version": "1.0",
   "author": "Paolo Montesel (https://github.com/thebabush)",
   "minimumbinaryninjaversion": 0

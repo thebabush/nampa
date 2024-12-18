@@ -7,9 +7,6 @@ setup(name='nampa',
       author='Paolo Montesel',
       license='LGPL',
       packages=['nampa'],
-      install_requires=[
-          'future',
-      ],
       scripts=['dumpsig.py'],
       classifiers=[
           'Development Status :: 3 - Alpha',

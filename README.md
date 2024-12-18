@@ -30,7 +30,6 @@ For use as a Binary Ninja plugin:
 cd ~/.binaryninja/plugins/
 git clone git@github.com:thebabush/nampa.git
 cd nampa
-pip install -r requirements.txt # or sudo apt-get install python-future
 ```
 
 **NOTE:** apparently, Binary Ninja for Windows ships with its own python distribution so `pip install` accordingly.
