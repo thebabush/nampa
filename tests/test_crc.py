@@ -18,7 +18,7 @@ def test_random_values():
     for i in range(100):
         n = random.randint(0, 100)
         values = [random.randint(0, 0xFF) for _ in range(n)]
-        yield check_random_value, values
+        check_random_value(values)
 
 
 def check_random_value(bb):
